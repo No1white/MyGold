@@ -1,0 +1,102 @@
+<!--
+ * @Author: No1white 1072368472@qq.com
+ * @Date: 2022-08-09 19:43:49
+ * @LastEditors: No1white 1072368472@qq.com
+ * @LastEditTime: 2022-08-13 10:13:50
+ * @FilePath: \tire-foreman-agente:\WorkSpace\MyGold\html\防抖和节流.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <div class="debounceWrap">
+        <button id="btn">click me</button>
+        <input type="text" id="input">
+    </div>
+</body>
+<script>
+    document.getElementById('input').addEventListener('oninput', function (e) {
+        console.log(e);
+    })
+    const btn = document.getElementById('btn');
+    btn.addEventListener('click', throttle(function ({ }, a) {
+        console.log('点击了按钮');
+        console.log(a);
+    }, 1000, true))
+    // 简单版，实现了防抖的功能，无法传参
+    // 其实防抖和节流都是闭包 后面再讨论
+    // function debounce(func, time = 2000) {
+    //     // 第一次执行 timer =null
+    //     let timer = null;
+    //     // 这里为什么声明一个timer？  因为debounce返回了一个函数，而函数内部访问了timer这个变量,这样会导致timer不会被回收
+    //     // 这也是使得第二次执行的时候为什么timer不会再次为null
+    //     return function () {
+    //         // 第一次执行肯定为null所以进入
+    //         if (!timer) { 
+    //             // timer此时不为空了
+    //             timer = setTimeout(() => {
+    //                 func(); // 执行外部传来的函数
+    //                 timer = null; // 再次把timer设为null 使得函数可以再次执行
+    //             }, time)
+    //         }
+    //     }
+    // }
+    // // 简单版防抖函数，添加立即执行，当immediate为true的时候执行
+    // function debounce(func, time = 2000, immediate = true) {
+    //     let timer = null;
+    //     return function () {
+    //         if (!timer) { // 如果再次触发则清空.
+    //             timer = setTimeout(() => {
+    //                 !immediate && func();
+    //                 timer = null;
+    //             }, time)
+    //             immediate && func()
+    //         }
+    //     }
+    // }
+    // 最终版，实现了防抖的功能，无法传参
+    // 其实防抖和节流都是闭包 后面再讨论
+    function debounce(func, time = 2000) {
+        // 第一次执行 timer =null
+        let timer = null;
+        // 这里为什么声明一个timer？  因为debounce返回了一个函数，而函数内部访问了timer这个变量,这样会导致timer不会被回收
+        // 这也是使得第二次执行的时候为什么timer不会再次为null
+        return function (...args) { // 传参
+            // 第一次执行肯定为null所以进入
+            console.log(args);
+            if (!timer) {
+                // timer此时不为空了
+                timer = setTimeout(() => {
+                    func.apply(this, args) // 执行外部传来的函数
+                    timer = null; // 再次把timer设为null 使得函数可以再次执行
+                }, time)
+            }
+        }
+    }
+    // 简单版，节流其实就比防抖多了一步
+    function throttle(func, time) {
+        let timer = null;
+        return function (...args) {
+            if (timer) {// 第二次触发的时候，
+                //节流：如果还在规定的时间内，则什么也不执行
+                //防抖： 重新计时
+                return;
+            }
+            timer = setInterval(() => {
+                timeout = null;
+                func.apply(this, args)
+            }, time)
+        }
+    }
+</script>
+
+</html>
